@@ -1,0 +1,148 @@
+# STANDALONE TURTLEBOT3 AI GESTURE CONTROL - QUICK GUIDE
+# 独立版TurtleBot3 AI手势控制 - 快速指南
+
+═══════════════════════════════════════════════════════════════════════════
+NO WORKSTATION NEEDED! ALL ON TURTLEBOT3!
+不需要工作站！全部在TurtleBot3上！
+═══════════════════════════════════════════════════════════════════════════
+
+## WHAT YOU NEED
+## 需要什么
+
+Files:
+- standalone_turtlebot_gesture_control.py (main code)
+- turtlebot3_gesture_ai_package.xml
+- turtlebot3_gesture_ai_setup.py
+- turtlebot3_gesture_ai_setup.cfg
+
+Time: 30 minutes
+Location: TurtleBot3 only
+
+
+## INSTALLATION (ON TURTLEBOT3)
+## 安装（在TurtleBot3上）
+
+# 1. SSH into TurtleBot3
+ssh ubuntu@{TURTLEBOT3_IP}
+
+# 2. Install dependencies
+sudo apt update
+pip3 install --user mediapipe opencv-python numpy
+
+# 3. Create workspace
+mkdir -p ~/turtlebot3_ws/src
+cd ~/turtlebot3_ws/src
+
+# 4. Create package
+ros2 pkg create --build-type ament_python turtlebot3_gesture_ai
+
+# 5. Setup structure
+cd turtlebot3_gesture_ai
+mkdir -p turtlebot3_gesture_ai resource
+touch turtlebot3_gesture_ai/__init__.py
+touch resource/turtlebot3_gesture_ai
+
+# 6. Copy files
+# Copy standalone_turtlebot_gesture_control.py to:
+#   turtlebot3_gesture_ai/standalone_gesture_node.py
+# Copy turtlebot3_gesture_ai_package.xml to:
+#   package.xml
+# Copy turtlebot3_gesture_ai_setup.py to:
+#   setup.py
+# Copy turtlebot3_gesture_ai_setup.cfg to:
+#   setup.cfg
+
+# 7. Build
+cd ~/turtlebot3_ws
+source /opt/ros/humble/setup.bash
+colcon build --packages-select turtlebot3_gesture_ai
+source install/setup.bash
+
+
+## RUNNING (ON TURTLEBOT3)
+## 运行（在TurtleBot3上）
+
+# Terminal 1: Launch robot
+export TURTLEBOT3_MODEL=waffle_pi
+export ROS_DOMAIN_ID=30
+ros2 launch turtlebot3_bringup robot.launch.py
+
+# Terminal 2: Run gesture control
+export ROS_DOMAIN_ID=30
+source ~/turtlebot3_ws/install/setup.bash
+ros2 run turtlebot3_gesture_ai gesture_control
+
+
+## GESTURES
+## 手势
+
+👆 Point up      → Forward (前进)
+👇 Point down    → Backward (后退)
+👈 Thumb left    → Turn left (左转)
+👉 Thumb right   → Turn right (右转)
+✋ Open palm     → Stop (停止)
+
+
+## ADVANTAGES
+## 优势
+
+✅ No Docker
+✅ No workstation
+✅ No network issues
+✅ Simpler setup
+✅ Still uses AI (hybrid navigation)
+✅ Works anywhere
+
+
+## FILE TRANSFER TO TURTLEBOT3
+## 文件传输到TurtleBot3
+
+# Option 1: SCP
+scp standalone_turtlebot_gesture_control.py ubuntu@{IP}:~/
+scp turtlebot3_gesture_ai_*.* ubuntu@{IP}:~/
+
+# Option 2: USB drive
+# Copy to USB, plug into TurtleBot3
+
+# Option 3: Direct edit on TurtleBot3
+ssh ubuntu@{IP}
+vim ~/standalone_gesture_node.py
+# Copy and paste code
+
+
+## TROUBLESHOOTING
+## 故障排除
+
+# Camera not found:
+ls /dev/video*
+
+# Dependencies missing:
+pip3 install --user --upgrade mediapipe opencv-python
+
+# Package not found:
+cd ~/turtlebot3_ws
+source /opt/ros/humble/setup.bash
+colcon build --packages-select turtlebot3_gesture_ai
+source install/setup.bash
+
+# Robot not moving:
+ros2 topic echo /cmd_vel
+
+
+## VERIFICATION
+## 验证
+
+# Check package installed:
+ros2 pkg list | grep turtlebot3_gesture_ai
+
+# Check executable:
+ros2 pkg executables turtlebot3_gesture_ai
+
+# Check topics:
+ros2 topic list | grep cmd_vel
+
+
+═══════════════════════════════════════════════════════════════════════════
+🎉 SIMPLER, FASTER, NO WORKSTATION NEEDED!
+   更简单、更快、不需要工作站！
+═══════════════════════════════════════════════════════════════════════════
