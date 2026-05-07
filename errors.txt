@@ -1,0 +1,37 @@
+python3 << 'EOF'
+import sys
+print("Python version:", sys.version)
+print("\nChecking packages...")
+
+try:
+    import numpy
+    print("✅ numpy:", numpy.__version__)
+except Exception as e:
+    print("❌ numpy:", e)
+
+try:
+    import cv2
+    print("✅ opencv-python:", cv2.__version__)
+except Exception as e:
+    print("❌ opencv-python:", e)
+
+try:
+    import mediapipe
+    print("✅ mediapipe:", mediapipe.__version__)
+except Exception as e:
+    print("❌ mediapipe:", e)
+
+print("\nTesting camera access...")
+cap = cv2.VideoCapture(0)
+if cap.isOpened():
+    print("✅ Camera access: OK")
+    cap.release()
+else:
+    print("❌ Camera access: FAILED")
+EOF
+
+esting camera access...
+[ WARN:0@9.251] global /home/nvidia/workspace/opencv-4.6.0/modules/videoio/src/cap_gstreamer.cpp (2401) handleMessage OpenCV | GStreamer warning: Embedded video playback halted; module v4l2src0 reported: Internal data stream error.
+[ WARN:0@9.252] global /home/nvidia/workspace/opencv-4.6.0/modules/videoio/src/cap_gstreamer.cpp (1356) open OpenCV | GStreamer warning: unable to start pipeline
+[ WARN:0@9.252] global /home/nvidia/workspace/opencv-4.6.0/modules/videoio/src/cap_gstreamer.cpp (862) isPipelinePlaying OpenCV | GStreamer warning: GStreamer: pipeline have not been created
+
