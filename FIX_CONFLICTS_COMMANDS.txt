@@ -1,0 +1,117 @@
+# FIX VERSION CONFLICTS - SIMPLE COMMANDS
+# 修复版本冲突 - 简单命令
+
+═══════════════════════════════════════════════════════════════════════════
+COPY AND PASTE THESE COMMANDS
+复制粘贴这些命令
+═══════════════════════════════════════════════════════════════════════════
+
+## STEP 1: UNINSTALL EVERYTHING
+## 步骤1：卸载所有东西
+
+pip3 uninstall -y mediapipe opencv-python opencv-python-headless opencv-contrib-python numpy torch torchvision
+
+
+## STEP 2: CLEAR CACHE
+## 步骤2：清理缓存
+
+pip3 cache purge
+
+
+## STEP 3: VERIFY CLEAN
+## 步骤3：验证清理
+
+pip3 list --user | grep -E "mediapipe|opencv|numpy"
+# Should show nothing
+
+
+## STEP 4: REINSTALL (IN ORDER)
+## 步骤4：重新安装（按顺序）
+
+pip3 install --user numpy
+pip3 install --user opencv-python
+pip3 install --user mediapipe
+
+
+## STEP 5: VERIFY INSTALLATION
+## 步骤5：验证安装
+
+python3 -c "import numpy; print('✅ numpy:', numpy.__version__)"
+python3 -c "import cv2; print('✅ opencv:', cv2.__version__)"
+python3 -c "import mediapipe; print('✅ mediapipe:', mediapipe.__version__)"
+
+
+## STEP 6: TEST CAMERA
+## 步骤6：测试摄像头
+
+python3 << 'EOF'
+import cv2
+cap = cv2.VideoCapture(0)
+if cap.isOpened():
+    print("✅ Camera OK")
+    cap.release()
+else:
+    print("❌ Camera FAILED")
+EOF
+
+
+═══════════════════════════════════════════════════════════════════════════
+ALTERNATIVE: USE VIRTUAL ENVIRONMENT (RECOMMENDED)
+替代方案：使用虚拟环境（推荐）
+═══════════════════════════════════════════════════════════════════════════
+
+## CREATE AND ACTIVATE VENV
+## 创建并激活虚拟环境
+
+python3 -m venv ~/turtlebot_venv
+source ~/turtlebot_venv/bin/activate
+
+
+## INSTALL IN VENV
+## 在虚拟环境中安装
+
+pip3 install numpy opencv-python mediapipe
+
+
+## TEST
+## 测试
+
+python3 -c "import mediapipe, cv2, numpy; print('✅ All OK!')"
+
+
+## AUTO-ACTIVATE (ADD TO BASHRC)
+## 自动激活（添加到bashrc）
+
+echo "source ~/turtlebot_venv/bin/activate" >> ~/.bashrc
+
+
+═══════════════════════════════════════════════════════════════════════════
+IF STILL HAVE ISSUES
+如果仍有问题
+═══════════════════════════════════════════════════════════════════════════
+
+## NUCLEAR OPTION: DELETE EVERYTHING
+## 核心选项：删除所有东西
+
+rm -rf ~/.local/lib/python3.*/site-packages/*
+pip3 cache purge
+
+
+## THEN REINSTALL
+## 然后重新安装
+
+pip3 install --user numpy opencv-python mediapipe
+
+
+═══════════════════════════════════════════════════════════════════════════
+AFTER FIXING, REBUILD ROS2 PACKAGE
+修复后，重新编译ROS2包
+═══════════════════════════════════════════════════════════════════════════
+
+cd ~/turtlebot3_ws
+source /opt/ros/humble/setup.bash
+colcon build --packages-select turtlebot3_gesture_ai
+source install/setup.bash
+
+
+═══════════════════════════════════════════════════════════════════════════
