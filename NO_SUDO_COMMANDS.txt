@@ -1,0 +1,147 @@
+# NO SUDO - COMMAND SEQUENCE ONLY
+# 无SUDO - 仅命令序列
+
+═══════════════════════════════════════════════════════════════════════════
+ALL COMMANDS - NO SUDO REQUIRED
+所有命令 - 不需要SUDO
+═══════════════════════════════════════════════════════════════════════════
+
+## ON TURTLEBOT3 - SSH AND INSTALL
+## 在TurtleBot3上 - SSH并安装
+
+ssh ubuntu@{TURTLEBOT3_IP}
+
+pip3 install --user mediapipe opencv-python numpy
+
+python3 -c "import mediapipe, cv2, numpy; print('✅ All OK!')"
+
+
+## CREATE WORKSPACE AND PACKAGE
+## 创建工作空间和包
+
+mkdir -p ~/turtlebot3_ws/src
+cd ~/turtlebot3_ws/src
+
+ros2 pkg create --build-type ament_python turtlebot3_gesture_ai
+
+cd turtlebot3_gesture_ai
+mkdir -p turtlebot3_gesture_ai resource launch
+touch turtlebot3_gesture_ai/__init__.py
+touch resource/turtlebot3_gesture_ai
+
+
+## TRANSFER FILES
+## 传输文件
+
+# Method 1: SCP from your computer
+scp standalone_turtlebot_gesture_control.py ubuntu@{IP}:~/turtlebot3_ws/src/turtlebot3_gesture_ai/turtlebot3_gesture_ai/standalone_gesture_node.py
+scp turtlebot3_gesture_ai_package.xml ubuntu@{IP}:~/turtlebot3_ws/src/turtlebot3_gesture_ai/package.xml
+scp turtlebot3_gesture_ai_setup.py ubuntu@{IP}:~/turtlebot3_ws/src/turtlebot3_gesture_ai/setup.py
+scp turtlebot3_gesture_ai_setup.cfg ubuntu@{IP}:~/turtlebot3_ws/src/turtlebot3_gesture_ai/setup.cfg
+
+# Method 2: vim and paste (on TurtleBot3)
+cd ~/turtlebot3_ws/src/turtlebot3_gesture_ai
+vim turtlebot3_gesture_ai/standalone_gesture_node.py  # paste code
+vim package.xml  # paste content
+vim setup.py  # paste content
+vim setup.cfg  # paste content
+
+
+## BUILD PACKAGE (NO SUDO)
+## 编译包（无SUDO）
+
+cd ~/turtlebot3_ws
+source /opt/ros/humble/setup.bash
+colcon build --packages-select turtlebot3_gesture_ai
+source install/setup.bash
+echo "source ~/turtlebot3_ws/install/setup.bash" >> ~/.bashrc
+
+
+## VERIFY
+## 验证
+
+ros2 pkg list | grep turtlebot3_gesture_ai
+ros2 pkg executables turtlebot3_gesture_ai
+
+
+## RUN - TERMINAL 1
+## 运行 - 终端1
+
+export TURTLEBOT3_MODEL=waffle_pi
+export ROS_DOMAIN_ID=30
+ros2 launch turtlebot3_bringup robot.launch.py
+
+
+## RUN - TERMINAL 2 (New SSH session)
+## 运行 - 终端2（新SSH会话）
+
+ssh ubuntu@{TURTLEBOT3_IP}
+export ROS_DOMAIN_ID=30
+source ~/turtlebot3_ws/install/setup.bash
+ros2 run turtlebot3_gesture_ai gesture_control
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+## GESTURES
+## 手势
+
+👆 Point up      → Forward
+👇 Point down    → Backward
+👈 Thumb left    → Turn left
+👉 Thumb right   → Turn right
+✋ Open palm     → Stop
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+## TROUBLESHOOTING (NO SUDO)
+## 故障排除（无SUDO）
+
+# Python packages not found:
+pip3 install --user --upgrade mediapipe opencv-python numpy
+echo 'export PATH=$HOME/.local/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+
+# Camera access denied:
+groups | grep video
+# If 'video' not in groups, ask admin to run:
+# sudo usermod -a -G video ubuntu
+# Then logout and login
+
+# Package not found:
+cd ~/turtlebot3_ws
+source /opt/ros/humble/setup.bash
+colcon build --packages-select turtlebot3_gesture_ai
+source install/setup.bash
+
+# ROS2 commands not found:
+source /opt/ros/humble/setup.bash
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+## VERIFICATION COMMANDS
+## 验证命令
+
+# Check Python packages:
+pip3 list --user | grep -E "mediapipe|opencv|numpy"
+
+# Check camera:
+ls -la /dev/video0
+python3 -c "import cv2; cap = cv2.VideoCapture(0); print('✅' if cap.isOpened() else '❌'); cap.release()"
+
+# Check package:
+ros2 pkg list | grep turtlebot3_gesture_ai
+
+# Check topics while running:
+ros2 topic list
+ros2 topic echo /cmd_vel
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+✅ ALL COMMANDS WORK WITHOUT SUDO!
+   所有命令都不需要SUDO！
+
+═══════════════════════════════════════════════════════════════════════════
